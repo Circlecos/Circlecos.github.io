@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://circlecos.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"lazyload":false,"style":"tabs","active":null,"storage":true,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="源地址 arXiv:1712.07465: Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition 简介 识别图像中的多个标签是计算机视觉中的一项基本但具有挑战性的任务。针对现有方法计算成本高、不能有效利用空间上下文的问题，论文提出了循环迭代的结合注意力机制的强化学习框架，并进行了对应的熔断">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读 | Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition">
+<meta property="og:url" content="http://circlecos.github.io/2019/07/17/paper-arxiv1712-07465/index.html">
+<meta property="og:site_name" content="A Circle">
+<meta property="og:description" content="源地址 arXiv:1712.07465: Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition 简介 识别图像中的多个标签是计算机视觉中的一项基本但具有挑战性的任务。针对现有方法计算成本高、不能有效利用空间上下文的问题，论文提出了循环迭代的结合注意力机制的强化学习框架，并进行了对应的熔断">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/01/26/5fY32ySK6UTPnVu.png">
+<meta property="og:image" content="https://i.loli.net/2020/01/26/FUJIoEn7SmuehKG.png">
+<meta property="article:published_time" content="2019-07-17T07:50:36.000Z">
+<meta property="article:modified_time" content="2020-01-27T01:50:28.895Z">
+<meta property="article:author" content="Circle">
+<meta property="article:tag" content="paper">
+<meta property="article:tag" content="multi-label_image_recognition">
+<meta property="article:tag" content="attention">
+<meta property="article:tag" content="LSTM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/01/26/5fY32ySK6UTPnVu.png">
+
+<link rel="canonical" href="http://circlecos.github.io/2019/07/17/paper-arxiv1712-07465/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>论文阅读 | Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition | A Circle</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-157025168-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-157025168-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">A Circle</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div><script type="module" src="/js/custom.js"></script>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://circlecos.github.io/2019/07/17/paper-arxiv1712-07465/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Circle">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="A Circle">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          论文阅读 | Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-17 15:50:36" itemprop="dateCreated datePublished" datetime="2019-07-17T15:50:36+08:00">2019-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-27 09:50:28" itemprop="dateModified" datetime="2020-01-27T09:50:28+08:00">2020-01-27</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2019/07/17/paper-arxiv1712-07465/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/07/17/paper-arxiv1712-07465/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="源地址">源地址</h1>
+<p><a href="https://arxiv.org/abs/1712.07465" target="_blank" rel="noopener">arXiv:1712.07465: Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition</a></p>
+<h1 id="简介">简介</h1>
+<p>识别图像中的多个标签是计算机视觉中的一项基本但具有挑战性的任务。针对现有方法计算成本高、不能有效利用空间上下文的问题，论文提出了循环迭代的结合注意力机制的强化学习框架，并进行了对应的熔断测试。</p>
+<a id="more"></a>
+<h1 id="框架结构">框架结构</h1>
+<p><img src="https://i.loli.net/2020/01/26/5fY32ySK6UTPnVu.png" /></p>
+<h2 id="输入部分">输入部分</h2>
+<p>将图片放缩至W*H的大小，送入FCN（VGG16 ConvNet)产生特征图<span class="math inline">\(f_I\)</span>。</p>
+<h2 id="循环注意力感知模块">循环注意力感知模块</h2>
+<p>第t次迭代，模块首先接收在前一次迭代中计算的位置<span class="math inline">\(l_t\)</span>，并基于<span class="math inline">\(l_t\)</span>按照不同的区域大小、不同的长宽比，提取k个区域<span class="math inline">\(R_t=\{R_{tr}\}^k_{r=1}\)</span>，然后从<span class="math inline">\(f_I\)</span>中提取这些区域的特征，得到<span class="math inline">\(f_{tr} = G(f_i, R_{tr}) r=1,2,\cdots,k\)</span>。</p>
+<p>接下来，将特征送入LSTM网络实现的循环注意感知模块，将前一次迭代的隐藏状态以及当前定位区域的特征作为输入，得到每一个区域的得分<span class="math inline">\(\{a_{t1},a_{t2},\cdots,a_{tk}\}\)</span>并搜索下一次迭代的最佳位置<span class="math inline">\(l_{k+1}\)</span>。初始区域设置为整个图像，因此<span class="math inline">\(R_0\)</span>只有一个区域，它仅用于确定的位置。</p>
+<p>重复T+1次迭代，产生<span class="math inline">\(T \cdot k\)</span>个得分向量，分别在每个类别中选出最大的得分向量，即</p>
+<p><span class="math display">\[ a^c = \max(a^c_{11},a^c_{12},\cdots, a^c_{Tk}),c = 0,1, \cdots,C-1\]</span></p>
+<h2 id="训练过程">训练过程</h2>
+<p>在形式上，模型需要学习策略<span class="math inline">\(\pi ((a_t,l_t+1)| S_t;\theta)\)</span>，该策略基于过去观察的序列和代理所采取的动作（即）来预测当前迭代的动作分布。为此，我们定义目标函数以最大化期望奖励，表示为：</p>
+<p><span class="math display">\[J(\theta) = E_{P(S_T;\theta)}[R]\]</span></p>
+<p><span class="math display">\[\nabla J(\theta) = \sum ^{T}_{t=1} E_{P(S_T;\theta)}[\nabla_{\theta}log\pi ((a_t,l_t+1)| S_t;\theta)R]\]</span></p>
+<p>其中，<span class="math inline">\(R\)</span> 为奖励函数，通过比对实际标签获得，即</p>
+<blockquote>
+<p>在每一个时间 t，主体接收到一个观测 <span class="math inline">\(o_t\)</span>，通常其中包含奖励 <span class="math inline">\(r_t\)</span>。然后，它从允许的集合中选择一个动作 <span class="math inline">\(a_{t}\)</span>，然后送出到环境中去。环境则变化到一个新的状态 <span class="math inline">\(s_{t+1}\)</span>，然后决定了和这个变化<span class="math inline">\((s_t,a_t,s_{t+1}\)</span>相关联的奖励 <span class="math inline">\(r_{t+1}\)</span>。强化学习主体的目标，是得到尽可能多的奖励。主体选择的动作是其历史的函数，它也可以选择随机的动作。</p>
+</blockquote>
+<ul>
+<li><p>环境：<span class="math inline">\(s_t\)</span>, 即<span class="math inline">\(\{f_{t1}, f_{t2}, \cdots, f_{tk}, h_{t-1}\}\)</span></p></li>
+<li><p>行动：</p>
+<ol type="1">
+<li><p>进行分类</p>
+<p>分类有分类网络实现，并且有一个额外的损失函数（预测概率向量和真实概率向量的平均平方差）</p></li>
+<li><p>寻找下一次<span class="math inline">\(l_{k+1}\)</span>的最佳位置</p>
+<p>由loc网络给出值作为一个位置的高斯分布的均值，高斯分布的方差则由经验给出。之后在高斯分布上随机取值。</p></li>
+</ol></li>
+<li><p>奖励：</p>
+<p><span class="math display">\[ r_t=\left\{
+  \begin{aligned}
+  \frac{|g\cap p|}{n}&amp; \quad t=T\\
+  0 &amp;\quad  t&lt;T\\
+  \end{aligned}
+  \right.
+  \]</span></p>
+<p><span class="math display">\[R=\sum^T_{t=1}\gamma^{t-1}r_t\]</span></p></li>
+<li></li>
+</ul>
+<h1 id="细节">细节</h1>
+<h2 id="输入部分-1">输入部分</h2>
+<ol type="1">
+<li><p>训练期间，所有样本图像的大小会调整为N*N，并随机裁剪为五个<span class="math inline">\((N-64)(N-64)\)</span>的图像片段，同时对五个片段进行水平翻转，产生十个视图。最终结果为十个视图预测向量的平均值。</p></li>
+<li><p>在实验中，生成整张特征图，并相应地为每个patch裁剪特征图，有效地减少了计算量。</p></li>
+<li><p>在实验中，k设置为9个，通过三个尺度区域和三个宽高比产生。从而能够对更多种类的图像进行实验。</p></li>
+</ol>
+<h2 id="循环注意力感知模块-1">循环注意力感知模块</h2>
+<ol type="1">
+<li><p>在特征图上进行裁剪操作，相比先前在原始输入图像处裁剪区域并应用CNN以重复提取每个区域的特征，避免了重复计算。</p></li>
+<li><p>LSTM相关</p></li>
+</ol>
+<blockquote>
+<p>长短期记忆网络（Long Short Term Memory networks） 设计 LSTMs 主要是为了避长时期依赖 （long-term dependency ）的问题。 <img src="https://i.loli.net/2020/01/26/FUJIoEn7SmuehKG.png" alt="image.png" /></p>
+</blockquote>
+<p>LSTM通过隐藏层状态进行遗忘、传入和输出。</p>
+<h2 id="消融研究">消融研究</h2>
+<blockquote>
+<p>An ablation study typically refers to removing some “feature” of the model or algorithm, and seeing how that affects performance.</p>
+</blockquote>
+<p>论文设计实验分析了关注区域、LSTM、可变比例和纵横比的区域、迭代次数对效果的影响，以仔细评估和讨论模型的关键组成部分的贡献。</p>
+<h1 id="一些想法">一些想法</h1>
+<ol type="1">
+<li><p>随机裁剪和翻转是图像集扩充的常见方法，可以提高样本数量，从而更好地进行训练。一般来说，还可以通过加入噪声，改变对比度、清晰度，甚至是采用GAN生成数据。</p></li>
+<li><p>不同的尺度区域和不同的宽高比能够让模型更好地对物体进行检测，个人猜测即使在考虑成回归问题的时候也能够发挥不错的效果。</p></li>
+<li><p>个人理解，LSTM网络通过模仿人类选择性记忆的机制，改善了RNNs持续记忆的问题，即长文本等应用场景下RNNs需要过多样本和迭代次数来寻找合适的映射关系的问题。</p></li>
+<li><p>感觉上，LSTM的遗忘机制和ResNet的跨层连接有一些相同的点。</p></li>
+<li><p>消融研究能够有效地体现模型的优势，减少其他不确定因素的影响。和精心设计的图表一起，可以更好地实现对模型的展示。</p></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Circle
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://circlecos.github.io/2019/07/17/paper-arxiv1712-07465/" title="论文阅读 | Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition">http://circlecos.github.io/2019/07/17/paper-arxiv1712-07465/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/paper/" rel="tag"># paper</a>
+              <a href="/tags/multi-label-image-recognition/" rel="tag"># multi-label_image_recognition</a>
+              <a href="/tags/attention/" rel="tag"># attention</a>
+              <a href="/tags/LSTM/" rel="tag"># LSTM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/04/paper-Reidentification-by-Relative-Distance-Comparison/" rel="next" title="Note for Reidentification-by-Relative-Distance-Comparison">
+      Note for Reidentification-by-Relative-Distance-Comparison <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#源地址"><span class="nav-number">1.</span> <span class="nav-text">源地址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#框架结构"><span class="nav-number">3.</span> <span class="nav-text">框架结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#输入部分"><span class="nav-number">3.1.</span> <span class="nav-text">输入部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#循环注意力感知模块"><span class="nav-number">3.2.</span> <span class="nav-text">循环注意力感知模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练过程"><span class="nav-number">3.3.</span> <span class="nav-text">训练过程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#细节"><span class="nav-number">4.</span> <span class="nav-text">细节</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#输入部分-1"><span class="nav-number">4.1.</span> <span class="nav-text">输入部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#循环注意力感知模块-1"><span class="nav-number">4.2.</span> <span class="nav-text">循环注意力感知模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消融研究"><span class="nav-number">4.3.</span> <span class="nav-text">消融研究</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一些想法"><span class="nav-number">5.</span> <span class="nav-text">一些想法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Circle</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Circle</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://circlecos.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://circlecos.github.io/2019/07/17/paper-arxiv1712-07465/";
+    this.page.identifier = "2019/07/17/paper-arxiv1712-07465/";
+    this.page.title = "论文阅读 | Recurrent Attentional Reinforcement Learning for Multi-label Image Recognition";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://circlecos.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+<script type="text/javascript" color="#555" opacity="0.5" zIndex="-1" count="150" src="/js/canvas-nest.js"></script>
+</body>
+</html>
