@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://circlecos.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"lazyload":false,"style":"tabs","active":null,"storage":true,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Prepare  Win10 1809 17763.973 VirtualBox 6.0.8 android-x86-9.0-rc2.iso  Note: I really recommend you to download from official website. Note: This article can only make android-x86 support arme">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Install Android-x86 on VirtualBox and enable armeabi support">
+<meta property="og:url" content="http://circlecos.github.io/2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/index.html">
+<meta property="og:site_name" content="A Circle">
+<meta property="og:description" content="Prepare  Win10 1809 17763.973 VirtualBox 6.0.8 android-x86-9.0-rc2.iso  Note: I really recommend you to download from official website. Note: This article can only make android-x86 support arme">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-02-16T04:44:41.000Z">
+<meta property="article:modified_time" content="2020-02-16T04:51:13.864Z">
+<meta property="article:author" content="Circle">
+<meta property="article:tag" content="Install Tutorial">
+<meta property="article:tag" content="Android-x86">
+<meta property="article:tag" content="VirtualBox">
+<meta property="article:tag" content="Arm">
+<meta property="article:tag" content="Armeabi">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://circlecos.github.io/2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Install Android-x86 on VirtualBox and enable armeabi support | A Circle</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-157025168-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-157025168-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">A Circle</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div><script type="module" src="/js/custom.js"></script>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://circlecos.github.io/2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Circle">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="A Circle">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Install Android-x86 on VirtualBox and enable armeabi support
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-02-16 12:44:41 / 修改时间：12:51:13" itemprop="dateCreated datePublished" datetime="2020-02-16T12:44:41+08:00">2020-02-16</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="prepare">Prepare</h1>
+<ul>
+<li>Win10 1809 17763.973</li>
+<li>VirtualBox 6.0.8</li>
+<li>android-x86-9.0-rc2.iso</li>
+</ul>
+<p>Note: I really <strong>recommend</strong> you to download from <strong>official website</strong>.</p>
+<p>Note: This article can only make <code>android-x86</code> support <code>armeabi</code>, <strong>not <code>armeabi-v7a</code> or <code>armeabi-v8a</code></strong></p>
+<a id="more"></a>
+<h1 id="steps">Steps</h1>
+<ol type="1">
+<li><p>Install Android-x86 into VirtualBox</p>
+<p>Before you read this article <a href="https://www.cnblogs.com/wynn0123/p/6288344.html" target="_blank" rel="noopener">Install Android-x86 into VirtualBox (By wynn0123)</a>, I have some points to tell you:</p>
+<ul>
+<li><p>wynn0123 told us to select <code>ext3</code> but I only see <code>ext4</code>. For me, choosing <code>ext4</code> is ok, and choosing <code>ntfs</code> is also <strong>unable</strong> to work.</p></li>
+<li><p>I didn't skip the setting guild, maybe you want to do that.</p></li>
+<li><p>I chose <code>Other Linux(32-bit)</code> here.</p></li>
+<li><p>When choosing <strong>Network Settings</strong>, I chose <code>NAT</code>. For me, I connected to the network successfully by opening the WiFi and connecting to the WiFi named <code>VirtWiFi</code> (on virtual machine).</p></li>
+</ul></li>
+<li><p>Enable nativebridge</p>
+<ol type="1">
+<li><p><code>adb shell</code> or use terminal app inside Android-x86</p></li>
+<li><p>Directly go to <code>/system/bin</code> or use <code>which enable_nativebridge</code> to get the path</p></li>
+<li><p>(<strong>If you don't set VPN inside VM, skip this and go next</strong>)</p>
+<p>Directly run <code>enable_nativebridge</code>(maybe you need VPN), Then jump to <code>10.</code> to check it.</p></li>
+<li><p>Copy <code>enable_nativebridge</code> to <code>/data/local/tmp/</code></p>
+<ul>
+<li>Optional: <code>adb pull</code> it to your local machine using <code>adb pull /system/bin/enable_nativebridge .\enable_nativebridge</code></li>
+</ul></li>
+<li><p>Open the file <code>/data/local/tmp/enable_nativebridge</code> and then add <code>echo $v $url &amp;&amp; exit</code> before <code>wget $url</code></p></li>
+<li><p>Run <code>data/local/tmp/enable_nativebridge</code> and get version and url</p></li>
+<li><p>If you get the url, download it. If you only get the version (like me), open the file and search the urls. Then open those, find the url matched the version.</p></li>
+<li><p><code>adb push</code> the <code>houdini.sfs</code> you just downloaded into the VM, and copy it to <code>/system/etc/houdini$v.sfs</code>(replace <code>$v</code> with version name, for me, it's <code>9_y</code>)</p></li>
+<li><p>Run the <code>/system/bin/enable_nativebridge</code></p></li>
+<li><p>check the existence of <code>/system/lib/arm</code></p></li>
+<li><p>Go to <code>Settings --&gt; Android-x86 options</code> and enable <code>Enable native bridge</code></p></li>
+</ol></li>
+</ol>
+<details>
+<p><summary>Maybe you need:</summary></p>
+<ul>
+<li><p><a href="https://www.jianshu.com/p/73198c3bfbb1" target="_blank" rel="noopener">Android-X86集成houdini(Arm兼容工具) (By 赵海洋)</a></p></li>
+<li><p><a href="https://blog.pinkd.moe/android/2018/10/07/android-x86-with-armabi-support#%E9%85%8D%E7%BD%AEarm%E5%85%BC%E5%AE%B9" target="_blank" rel="noopener">配置一个兼容arm的x86的Android虚拟机 (By PinkD)</a></p></li>
+<li><p><a href="https://blog.csdn.net/Listener_ri/article/details/45922539" target="_blank" rel="noopener">通过ip地址连接virtualbox虚拟机android-x86 (By listenerri)</a></p></li>
+<li><p><a href="https://adbshell.com/commands/adb-push" target="_blank" rel="noopener">adb push</a></p></li>
+<li><p>Use Vpn on Android-x86</p>
+<ul>
+<li><p>If you use NAT, you can go to the WiFi setting and set proxy there (on virtual machine).</p></li>
+<li><p><a href="https://blog.csdn.net/Fyear100/article/details/93602452" target="_blank" rel="noopener">ubuntu虚拟机共享主机SSR (By ajuse)</a></p></li>
+<li><p>Use VPN inside Android system settings</p></li>
+<li><p>Use VPN software inside Android system</p></li>
+</ul></li>
+<li><p><a href="https://www.cnblogs.com/zhoumiao/p/8350110.html" target="_blank" rel="noopener">adb启动和停止android app方法 (By HugBugs)</a></p></li>
+</ul>
+</details>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Circle
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://circlecos.github.io/2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/" title="Install Android-x86 on VirtualBox and enable armeabi support">http://circlecos.github.io/2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Install-Tutorial/" rel="tag"># Install Tutorial</a>
+              <a href="/tags/Android-x86/" rel="tag"># Android-x86</a>
+              <a href="/tags/VirtualBox/" rel="tag"># VirtualBox</a>
+              <a href="/tags/Arm/" rel="tag"># Arm</a>
+              <a href="/tags/Armeabi/" rel="tag"># Armeabi</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/26/Multiple-View-Geometry-in-Computer-Vision-Section-1-1-2-3/" rel="prev" title="[Note for book] Multiple View Geometry in Computer Vision (Section 1.1 - 2.3)">
+      <i class="fa fa-chevron-left"></i> [Note for book] Multiple View Geometry in Computer Vision (Section 1.1 - 2.3)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#prepare"><span class="nav-number">1.</span> <span class="nav-text">Prepare</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#steps"><span class="nav-number">2.</span> <span class="nav-text">Steps</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Circle</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Circle</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://circlecos.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://circlecos.github.io/2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/";
+    this.page.identifier = "2020/02/16/Install-Android-x86-on-VirtualBox-and-enable-armeabi-support/";
+    this.page.title = "Install Android-x86 on VirtualBox and enable armeabi support";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://circlecos.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+<script type="text/javascript" color="#555" opacity="0.5" zIndex="-1" count="150" src="/js/canvas-nest.js"></script>
+</body>
+</html>
